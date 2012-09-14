@@ -1,8 +1,11 @@
-    var ballcolor = "#FFFF00";      // yellow fill
-    var ballstroke = "#000000";     // black outline
-	var theCanvas = document.getElementById("mycanvas");
-	var theContext = theCanvas.getContext("2d");
- var circ = Math.PI*2; 
+//Every ball is fully Aware of the canvas
+var theCanvas = document.getElementById("mycanvas");
+var theContext = theCanvas.getContext("2d");
+//Constants for now.
+var ballcolor = "#FFFF00";      // yellow fill
+var ballstroke = "#000000";     // black outline
+var circ = Math.PI*2;
+ 
 function ball(x,y,radius)
 {
 	this.x =x;
