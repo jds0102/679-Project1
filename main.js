@@ -18,6 +18,8 @@ SETUP CONSTANTS
 	var theContext = theCanvas.getContext("2d");
 
    var playerBall = new ball(300,300,10);
+   var enemy1 = new enemy(300, 100, 10);
+   enemy1.follow(playerBall);
     // this function will do the drawing
     function drawObjects() {
         // clear the window
@@ -25,6 +27,7 @@ SETUP CONSTANTS
         // draw the balls - too bad we can't use for i in theBalls
         //anObject.draw();
 		playerBall.draw();
+		enemy1.draw();
     }
     
     // what to do when things get clicked
@@ -43,6 +46,7 @@ SETUP CONSTANTS
     // draws, then schedules another iteration in the future
     // WARNING: this is the simplest, but not the best, way to do this
     function drawLoop() {
+		enemy1.move();
         drawObjects();     // show things
         reqFrame(drawLoop);
     }
