@@ -19,7 +19,13 @@ SETUP CONSTANTS
 
    var playerBall = new ball(300,300,10);
    var enemy1 = new enemy(300, 100, 10);
+   var enemy2 = new enemy(100, 600, 10);
+   var enemy3 = new enemy(300, 500, 10);
+   var enemy4 = new enemy(400, 400, 10);
    enemy1.follow(playerBall);
+   enemy2.follow(enemy1);
+   enemy3.follow(enemy1);
+   enemy4.follow(enemy1);
     // this function will do the drawing
     function drawObjects() {
         // clear the window
@@ -28,6 +34,9 @@ SETUP CONSTANTS
         //anObject.draw();
 		playerBall.draw();
 		enemy1.draw();
+		enemy2.draw();
+		enemy3.draw();
+		enemy4.draw();
     }
     
     // what to do when things get clicked
@@ -47,6 +56,9 @@ SETUP CONSTANTS
     // WARNING: this is the simplest, but not the best, way to do this
     function drawLoop() {
 		enemy1.move();
+		enemy2.move();
+		enemy3.move();
+		enemy4.move();
         drawObjects();     // show things
         reqFrame(drawLoop);
     }
