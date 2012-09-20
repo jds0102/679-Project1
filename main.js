@@ -19,12 +19,14 @@ SETUP CONSTANTS
 	
 	var radius = 5;
     var player = new PlayerBall(450,220,8,8,5,"#00FF00");
-    var flock1 = new EnemyBall(100,200,1,1,5,"#FF0000");
+    var flock1 = new EnemyBall(100,200,4,4,5,"#FF00FF");
 	flock1.following = player;
-	theBalls = [];
+	flock1.isLeader = 1;
+	theBalls = []; //The array of all the balls
+	theFlocks = []; //The array of flocks which are arrays of Balls
 	
 	theBalls.push(flock1);
-	for (var i=0; i<10; i++) {
+	for (var i=0; i<20; i++) {
         b = new EnemyBall(50+Math.random()*500, 50+Math.random()*500,2,2,5, "#FF0000");
         theBalls.push(b)
 		b.following = flock1;
@@ -52,8 +54,77 @@ SETUP CONSTANTS
                     bi.vx = -dx;
                     bi.vy = -dy;
                 }
+				
             }
         }
+    }
+	/*function align(ballList)
+	{
+	    var rad = 10 * radius;
+        rad = rad*rad;
+        
+        for(var i=ballList.length-1; i>=0; i--) {
+            var bi = ballList[i];
+            var bix = bi.x;
+            var biy = bi.y;
+			if(!bi.isLeader)
+			{
+			    var bj = bi.following;
+			    var bjx = bj.x;
+                var bjy = bj.y;
+                var dx = bjx - bix;
+                var dy = bjy - biy;
+				var d = dx*dx+dy*dy;
+			    //compute distance between myself and leader
+				if (d < rad) {
+                    bi.vx = bj.vx;
+					bi.vy = bj.vy;
+                }
+			}
+        }
+	}*/
+	// Reynold's like alignment
+    // each boid tries to make it's velocity to be similar to its neighbors
+    // recipricol falloff in weight (allignment parameter + d
+    // this assumes the velocities will be renormalized
+    function align(ballList)
+    {
+        var ali = .1; // alignment parameter - between 0 and 1
+    
+        // make temp arrays to store results
+        // this is inefficient, but the goal here is to make it work first
+        var newVX = new Array(ballList.length);
+        var newVY = new Array(ballList.length);
+    
+        // do the n^2 loop over all pairs, and sum up the contribution of each
+        for(var i=ballList.length-1; i>=0; i--) {
+            var bi = ballList[i];
+			if(!bi.isLeader)
+			{
+            var bix = bi.x;
+            var biy = bi.y;
+            newVX[i] = 0;
+            newVY[i] = 0;
+			
+            for(var j=ballList.length-1; j>=0; j--) {
+                var bj = ballList[j];
+                // compute the distance for falloff
+                var dx = bj.x - bix;
+                var dy = bj.y - biy;
+                var d = Math.sqrt(dx*dx+dy*dy);
+                // add to the weighted sum
+                newVX[i] += (bj.vx / (d+ali));
+                newVY[i] += (bj.vy / (d+ali));
+            }
+			}
+        }
+        for(var i=ballList.length-1; i>=0; i--) {
+		    if(!ballList[i].isLeader)
+			{
+				ballList[i].vx = newVX[i];
+				ballList[i].vy = newVY[i];
+			}
+        } 
     }
     // this function will do the drawing
     function drawObjects() {
@@ -68,10 +139,13 @@ SETUP CONSTANTS
     }
     function updateObjects()
 	{
+	    //first we need to set the correct place to follow
 	    for(var i = 0; i < theBalls.length; i++)
 		{
 		   theBalls[i].follow();
 		}
+		//Then we need to adjust the flock to the direction of the leader
+		align(theBalls);
 	    bounce(theBalls);
         for(var i = 0; i < theBalls.length; i++)
 		{
