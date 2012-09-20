@@ -54,6 +54,7 @@ SETUP CONSTANTS
     // what we need to do is define a function that updates the position
     // draws, then schedules another iteration in the future
     // WARNING: this is the simplest, but not the best, way to do this
+	alert("This is how you play");
     function drawLoop() {
 		enemy1.move();
 		enemy2.move();
