@@ -16,54 +16,82 @@ SETUP CONSTANTS
 
 	var theCanvas = document.getElementById("mycanvas");
 	var theContext = theCanvas.getContext("2d");
-    var testBall = new Ball(300,220,-1,-2,5,"#FF00FF");
-    var player = new PlayerBall(450,220,20,20,10,"#00FF00");
-    var enemy1 = new EnemyBall(100,200,5,5,5,"#FF0000");
-    enemy1.follow(player);
-   /*var enemy2 = new enemy(100, 600, 10);
-   var enemy3 = new enemy(300, 500, 10);
-   var enemy4 = new enemy(400, 400, 10);
-   enemy1.follow(playerBall);
-   enemy2.follow(enemy1);
-   enemy3.follow(enemy1);
-   enemy4.follow(enemy1);*/
+	
+	var radius = 5;
+    var player = new PlayerBall(450,220,8,8,5,"#00FF00");
+    var flock1 = new EnemyBall(100,200,1,1,5,"#FF0000");
+	flock1.following = player;
+	theBalls = [];
+	
+	theBalls.push(flock1);
+	for (var i=0; i<10; i++) {
+        b = new EnemyBall(50+Math.random()*500, 50+Math.random()*500,2,2,5, "#FF0000");
+        theBalls.push(b)
+		b.following = flock1;
+    }
+	
+    function bounce(ballList) {
+        var rad = 2 * radius;
+        rad = rad*rad;
+        
+        for(var i=ballList.length-1; i>=0; i--) {
+            var bi = ballList[i];
+            var bix = bi.x;
+            var biy = bi.y;
+            // notice that we do the n^2 checks here, slightly painful
+            for(var j=i-1; j>=0; j--) {
+                var bj = ballList[j];
+                var bjx = bj.x;
+                var bjy = bj.y;
+                var dx = bjx - bix;
+                var dy = bjy - biy;
+                var d = dx*dx+dy*dy;
+                if (d < rad) {
+                    bj.vx = dy;
+                    bj.vy = dx;
+                    bi.vx = -dx;
+                    bi.vy = -dy;
+                }
+            }
+        }
+    }
     // this function will do the drawing
     function drawObjects() {
         // clear the window
         theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
         // draw the balls - too bad we can't use for i in theBalls
-		enemy1.draw();
-        player.draw()
-		testBall.draw();
+		for(var i = 0; i < theBalls.length; i++)
+	    {
+		    theBalls[i].draw();
+		}
+		player.draw();
     }
     function updateObjects()
 	{
-	   enemy1.move();
-	   testBall.move();
+	    for(var i = 0; i < theBalls.length; i++)
+		{
+		   theBalls[i].follow();
+		}
+	    bounce(theBalls);
+        for(var i = 0; i < theBalls.length; i++)
+		{
+		    theBalls[i].norm();
+		    theBalls[i].move();
+		}
 	}
-    // what to do when things get clicked
-    function keyPressed(evt){
-        // a catch - we need to adjust for where the canvas is!
-        // this is quite ugly without some degree of support from
-        // a library
-		player.move(evt.keyCode);
-		
-    }
 	
-	//Add the event Listener
-    window.addEventListener('keydown',keyPressed,true);
+    function keyPressed(evt){
+		player.move(evt.keyCode);
+    }
 
-    // what we need to do is define a function that updates the position
-    // draws, then schedules another iteration in the future
-    // WARNING: this is the simplest, but not the best, way to do this
     function drawLoop() {
-		/*enemy1.move();
-		enemy2.move();
-		enemy3.move();
-		enemy4.move();*/
 		updateObjects();
         drawObjects();
         reqFrame(drawLoop);
     }
+		
+	//Add the event Listener
+    window.addEventListener('keydown',keyPressed,true);
+	//Start the Game
     drawLoop();
 }

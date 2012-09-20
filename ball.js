@@ -17,6 +17,13 @@ function Ball(x,y,vx,vy,radius,color)
     this.radius = radius;
 	this.color = color;
 	
+    this.norm = function () {
+        var z = Math.sqrt(this.vx * this.vx + this.vy * this.vy );
+        z = 1.0 / z;
+        this.vx *= z;
+	    this.vy *= z;
+    };
+	
     this.draw = function() {
         theContext.strokeStyle = "#0000000";
         theContext.fillStyle = this.color;
@@ -93,26 +100,12 @@ function EnemyBall(x,y,vx,vy,radius,color)
 {
     Ball.apply(this, arguments);
 	this.following;
-	
-	this.norm = function () {
-            var z = Math.sqrt(this.vx * this.vx + this.vy * this.vy );
-            z = 1.0 / z;
-            this.vx *= z;
-            this.vy *= z;
-    };
-    
-    this.move = function() {
+	this.flock;
+	this.isLeader;
+   
+    this.follow = function() {
 		this.vx = this.following.x - this.x;
 		this.vy = this.following.y - this.y;
-		this.norm();
-		this.x += this.vx;
-		this.y += this.vy;
-		
     };
-
-	this.follow = function(objectToFollow) {
-		this.following = objectToFollow;
-	};
-
 }
 
