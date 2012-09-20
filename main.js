@@ -68,6 +68,9 @@ SETUP CONSTANTS
     }
     function updateObjects()
 	{
+		player.update();
+		player.norm();
+		player.move();
 	    for(var i = 0; i < theBalls.length; i++)
 		{
 		   theBalls[i].follow();
@@ -80,8 +83,14 @@ SETUP CONSTANTS
 		}
 	}
 	
+	function doClick(evt){
+        
+        player.setDestination(evt.pageX - theCanvas.offsetLeft,
+        evt.pageY - theCanvas.offsetTop);
+    }
+	
     function keyPressed(evt){
-		player.move(evt.keyCode);
+		//player.move(evt.keyCode);
     }
 
     // what we need to do is define a function that updates the position
@@ -94,8 +103,9 @@ SETUP CONSTANTS
         reqFrame(drawLoop);
     }
 		
-	//Add the event Listener
+	//Add the event Listeners
     window.addEventListener('keydown',keyPressed,true);
+    theCanvas.addEventListener("click",doClick,false);
 	//Start the Game
     drawLoop();
 }

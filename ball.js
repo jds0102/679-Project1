@@ -64,32 +64,23 @@ function Ball(x,y,vx,vy,radius,color)
 //Player Ball
 PlayerBall.prototype = new Ball();
 function PlayerBall(x,y,vx,vy,radius,color)
-{	  
-    Ball.apply(this, arguments);
+{	
+	this.dx = x;
+	this.dy = y;
+  
 	
-    this.move = function(key) {	
-		switch (key) {
-		case 38:  /* Up arrow was pressed */
-			if (this.y - this.radius - this.vy > 0){
-				this.y -= this.vy;
-			}
-			break;
-		case 40:  /* Down arrow was pressed */
-			if (this.y + this.radius + this.vy < theCanvas.height){
-				this.y += this.vy;
-			}
-			break;
-		case 37:  /* Left arrow was pressed */
-			if (this.x - this.radius - this.vx > 0){
-				this.x -= this.vx;
-			}
-			break;
-		case 39:  /* Right arrow was pressed */
-			if (this.x + this.radius + this.vx < theCanvas.width){
-				this.x += this.vx;
-			}
-			break;
-		}
+    Ball.apply(this, arguments);	
+  
+	this.update = function() {
+		 if (this.x != this.dx || this.y != this.dy) {
+			this.vx = this.dx - this.x;
+			this.vy = this.dy - this.y;
+		 }
+    };
+	
+	this.setDestination = function(nextX,nextY) {
+		this.dx = nextX;
+		this.dy = nextY;
     };
 }
 
