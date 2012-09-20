@@ -92,7 +92,7 @@ function EnemyBall(x,y,vx,vy,radius,color)
     Ball.apply(this, arguments);
 	this.following;
 	this.flock;
-	this.isLeader;
+	this.isLeader = 0;
    
     this.follow = function() {
 		this.vx = this.following.x - this.x;
