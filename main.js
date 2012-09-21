@@ -19,17 +19,22 @@ SETUP CONSTANTS
 	
 	var radius = 5;
     var player = new PlayerBall(450,220,8,8,5,"#00FF00");
-    var flock1 = new EnemyBall(100,200,4,4,5,"#FF00FF");
-	flock1.following = player;
-	flock1.isLeader = 1;
+    //var flock1 = new EnemyBall(100,200,4,4,5,"#FF00FF");
+	//flock1.following = player;
+	//flock1.isLeader = 1;
 	theBalls = []; //The array of all the balls
 	theFlocks = []; //The array of flocks which are arrays of Balls
 	
-	theBalls.push(flock1);
-	for (var i=0; i<20; i++) {
+	//theBalls.push(flock1);
+	for (var i=0; i<10; i++) {
         b = new EnemyBall(50+Math.random()*500, 50+Math.random()*500,2,2,5, "#FF0000");
         theBalls.push(b)
-		b.following = flock1;
+		b.flock = 1;
+    }
+		for (var i=0; i<10; i++) {
+        b = new EnemyBall(50+Math.random()*500, 50+Math.random()*500,2,-2,5, "#FF00FF");
+        theBalls.push(b)
+		b.flock = 2;
     }
 	
     function bounce(ballList) {
@@ -89,7 +94,7 @@ SETUP CONSTANTS
     // this assumes the velocities will be renormalized
     function align(ballList)
     {
-        var ali = .1; // alignment parameter - between 0 and 1
+        var ali = 3; // alignment parameter - between 0 and 1
     
         // make temp arrays to store results
         // this is inefficient, but the goal here is to make it work first
@@ -108,6 +113,8 @@ SETUP CONSTANTS
 			
             for(var j=ballList.length-1; j>=0; j--) {
                 var bj = ballList[j];
+				if(bj.flock == bi.flock)
+				{
                 // compute the distance for falloff
                 var dx = bj.x - bix;
                 var dy = bj.y - biy;
@@ -115,8 +122,16 @@ SETUP CONSTANTS
                 // add to the weighted sum
                 newVX[i] += (bj.vx / (d+ali));
                 newVY[i] += (bj.vy / (d+ali));
+				}
+				
             }
 			}
+			 var dx = player.x - bix;
+                var dy = player.y - biy;
+                var d = Math.sqrt(dx*dx+dy*dy);
+                // add to the weighted sum
+                newVX[i] += (player.vx / (d+10));
+                newVY[i] += (player.vy / (d+10));
         }
         for(var i=ballList.length-1; i>=0; i--) {
 		    if(!ballList[i].isLeader)
@@ -145,7 +160,7 @@ SETUP CONSTANTS
 	    //first we need to set the correct place to follow
 	    for(var i = 0; i < theBalls.length; i++)
 		{
-		   theBalls[i].follow();
+		   //theBalls[i].follow();
 		}
 		//Then we need to adjust the flock to the direction of the leader
 		align(theBalls);
@@ -179,6 +194,7 @@ SETUP CONSTANTS
 		
 	//Add the event Listeners
     window.addEventListener('keydown',keyPressed,true);
+	window.addEventListener('keyup',keyPressed,true);
     theCanvas.addEventListener("click",doClick,false);
 	//Start the Game
     drawLoop();

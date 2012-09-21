@@ -67,21 +67,40 @@ function PlayerBall(x,y,vx,vy,radius,color)
 {	
 	this.dx = x;
 	this.dy = y;
-  
+    this.moving = false;
 	
     Ball.apply(this, arguments);	
   
 	this.update = function() {
-		 if (this.x != this.dx || this.y != this.dy) {
+		var xDis = Math.abs(this.x - this.dx)
+		var yDis = Math.abs(this.y - this.dy)
+		 if ( xDis > 5) {
 			this.vx = this.dx - this.x;
-			this.vy = this.dy - this.y;
+		 } else {
+			this.vx = 0;
 		 }
+		 
+		 if (yDis > 5) {
+		   this.vy = this.dy - this.y;
+		} else {
+			this.vy = 0;
+		}		 
     };
 	
 	this.setDestination = function(nextX,nextY) {
 		this.dx = nextX;
 		this.dy = nextY;
     };
+	
+	this.norm = function () {
+        var z = Math.sqrt(this.vx * this.vx + this.vy * this.vy );
+        if (z != 0) {
+			z = 3.0 / z;
+			this.vx *= z;
+			this.vy *= z;
+		}
+    };
+	
 }
 
 //EnemyBall
