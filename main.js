@@ -18,13 +18,19 @@ SETUP CONSTANTS
 	var theContext = theCanvas.getContext("2d");
 	
 	var score = 0;
+	var currentFlock =1;
+	var flockCount = 1;
+	var flockColor = "FF0000";
 	
 	var radius = 5;
-    var player = new PlayerBall(450,220,8,8,5,"#00FF00");
-    var food = new Ball(100,100,0,0,10,"099000");
-	var minDistance = (player.radius+food.radius)*(player.radius+food.radius);
-	theBalls = []; //The array of all the balls
 	
+    var player = new PlayerBall(450,220,8,8,5,"#00FF00");
+    var food = new Ball(100,100,0,0,8,"099000");
+	var minDistance = (player.radius+food.radius)*(player.radius+food.radius);
+    var te = new EnemyBall(50+Math.random()*500, 50+Math.random()*500,2,2,5, flockColor);	
+	te.flock = currentFlock;
+	theBalls = []; //The array of all the balls
+	theBalls.push(te);
     function updateScore(score)
 	{
 	    document.getElementById("score").innerHTML = "Score: "+score;
@@ -46,7 +52,7 @@ SETUP CONSTANTS
             }
 	   }
 	}
-	gameInitialize()
+	//gameInitialize()
 	
     function bounce(ballList) {
         var rad = 2 * radius;
@@ -137,6 +143,17 @@ SETUP CONSTANTS
 		    updateScore(++score);
             food.x = 50+Math.random()*500;
 			food.y = 50+Math.random()*500;
+			var n = new EnemyBall(50+Math.random()*500, 50+Math.random()*500,2,2,5, flockColor);
+			n.flock = currentFlock;
+			flockCount++;
+			theBalls.push(n);
+			
+			if(flockCount >=10)
+			{
+			   flockColor = '#'+Math.floor(Math.random()*16777215).toString(16);
+			   flockCount = 0;
+			   currentFlock++;
+			}
         }
 	}
     function checkDeath()
