@@ -17,25 +17,36 @@ SETUP CONSTANTS
 	var theCanvas = document.getElementById("mycanvas");
 	var theContext = theCanvas.getContext("2d");
 	
+	var score = 0;
+	
 	var radius = 5;
     var player = new PlayerBall(450,220,8,8,5,"#00FF00");
-    //var flock1 = new EnemyBall(100,200,4,4,5,"#FF00FF");
-	//flock1.following = player;
-	//flock1.isLeader = 1;
+    var food = new Ball(100,100,0,0,10,"099000");
+	var minDistance = (player.radius+food.radius)*(player.radius+food.radius);
 	theBalls = []; //The array of all the balls
-	theFlocks = []; //The array of flocks which are arrays of Balls
 	
-	//theBalls.push(flock1);
-	for (var i=0; i<10; i++) {
-        b = new EnemyBall(50+Math.random()*500, 50+Math.random()*500,2,2,5, "#FF0000");
-        theBalls.push(b)
-		b.flock = 1;
-    }
-		for (var i=0; i<10; i++) {
-        b = new EnemyBall(50+Math.random()*500, 50+Math.random()*500,2,-2,5, "#FF00FF");
-        theBalls.push(b)
-		b.flock = 2;
-    }
+    function updateScore(score)
+	{
+	    document.getElementById("score").innerHTML = "Score: "+score;
+	}
+	//I use this for testing. we can turn it off later.
+	function gameInitialize()
+	{
+	updateScore(score);
+	theBalls = new Array();
+	   for(var flock = 0; flock < 3; flock++)
+	   {
+	       //found this online. sorta understand how it works 16777215 = FFFFFF
+	       color = '#'+Math.floor(Math.random()*16777215).toString(16);
+	       for (var i=0; i<10; i++) {
+		      //I found the random color thing online
+              b = new EnemyBall(50+Math.random()*500, 50+Math.random()*500,2,2,5, color);
+              theBalls.push(b)
+		      b.flock = flock;
+            }
+	   }
+	}
+	gameInitialize()
 	
     function bounce(ballList) {
         var rad = 2 * radius;
@@ -63,31 +74,7 @@ SETUP CONSTANTS
             }
         }
     }
-	/*function align(ballList)
-	{
-	    var rad = 10 * radius;
-        rad = rad*rad;
-        
-        for(var i=ballList.length-1; i>=0; i--) {
-            var bi = ballList[i];
-            var bix = bi.x;
-            var biy = bi.y;
-			if(!bi.isLeader)
-			{
-			    var bj = bi.following;
-			    var bjx = bj.x;
-                var bjy = bj.y;
-                var dx = bjx - bix;
-                var dy = bjy - biy;
-				var d = dx*dx+dy*dy;
-			    //compute distance between myself and leader
-				if (d < rad) {
-                    bi.vx = bj.vx;
-					bi.vy = bj.vy;
-                }
-			}
-        }
-	}*/
+
 	// Reynold's like alignment
     // each boid tries to make it's velocity to be similar to its neighbors
     // recipricol falloff in weight (allignment parameter + d
@@ -141,6 +128,35 @@ SETUP CONSTANTS
 			}
         } 
     }
+
+	function checkFood()
+	{
+        var d = (player.x-food.x)*(player.x-food.x) +(player.y-food.y)*(player.y-food.y);
+		
+        if (d < minDistance) {
+		    updateScore(++score);
+            food.x = 50+Math.random()*500;
+			food.y = 50+Math.random()*500;
+        }
+	}
+    function checkDeath()
+	{
+        var rad = 2 * radius;
+        rad = rad*rad;
+        
+        for(var i=theBalls.length-1; i>=0; i--) {
+            var bi = theBalls[i];
+            var bix = bi.x;
+            var biy = bi.y;
+			var dx = player.x - bix;
+			var dy = player.y - biy;
+            var d = dx*dx+dy*dy;
+            if (d < rad) {
+                alert("you Dead son");
+				gameInitialize();
+            }
+        }
+	}
     // this function will do the drawing
     function drawObjects() {
         // clear the window
@@ -151,6 +167,7 @@ SETUP CONSTANTS
 		    theBalls[i].draw();
 		}
 		player.draw();
+		food.draw();
     }
     function updateObjects()
 	{
@@ -170,6 +187,8 @@ SETUP CONSTANTS
 		    theBalls[i].norm();
 		    theBalls[i].move();
 		}
+		checkFood();
+		checkDeath();
 	}
 	
 	function doClick(evt){
