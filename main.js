@@ -52,8 +52,8 @@ SETUP CONSTANTS
 		   //get out the first ball and try to place us close to them
 		   var first = theFlocks[currentFlock].balls[0];
 		   
-		   b.x = first.x + (Math.random()*radius*10-radius*5);
-		   b.y = first.y + (Math.random()*radius*10-radius*5);
+		   b.x = first.x + (Math.random()*radius*14-radius*7);
+		   b.y = first.y + (Math.random()*radius*14-radius*7);
 		   theFlocks[currentFlock].addBall(b);
 		   flockCount++;
 		}
@@ -78,7 +78,7 @@ SETUP CONSTANTS
 		
 		if(debug)
 		{
-			for(var balls = 0; balls < 50; balls++)
+			for(var balls = 0; balls < 40; balls++)
 			{
 				generateBall();
             }
@@ -164,9 +164,15 @@ SETUP CONSTANTS
 		player.norm();
 		player.move();
 		
-		for(var i = 0; i < theFlocks.length; i++)
+		for(var i = theFlocks.length-1; i >=0 ; i--)
 		{
 		   theFlocks[i].align();
+		   theFlocks[i].norm();
+		   for(var j = i-1; j>=0; j--)
+		   {
+		      theFlocks[i].repel(theFlocks[j]);
+		   }
+		   theFlocks[i].norm();
 		}
 		bounce(theBalls);
 	    //first we need to set the correct place to follow
