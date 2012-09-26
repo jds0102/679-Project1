@@ -78,7 +78,7 @@ SETUP CONSTANTS
 		
 		if(debug)
 		{
-			for(var balls = 0; balls < 40; balls++)
+			for(var balls = 0; balls < 150; balls++)
 			{
 				generateBall();
             }
