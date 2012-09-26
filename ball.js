@@ -59,6 +59,12 @@ function Ball(x,y,vx,vy,radius,color)
 			}
 		}
     };
+    
+    this.setVelocity = function(newVX, newVY) {
+    	this.vx = newVX;
+    	this.vy = newVY;
+    	//console.log("new velocity set to " + x +"," + y);
+    };
 }
 
 //Player Ball
@@ -68,29 +74,31 @@ function PlayerBall(x,y,vx,vy,radius,color)
 	this.dx = x;
 	this.dy = y;
     this.moving = false;
+	this.vx = 0;
+	this.vy = 0;
 	
     Ball.apply(this, arguments);	
   
-	this.update = function() {
-		var xDis = Math.abs(this.x - this.dx)
-		var yDis = Math.abs(this.y - this.dy)
-		 if ( xDis > 5) {
-			this.vx = this.dx - this.x;
-		 } else {
-			this.vx = 0;
-		 }
-		 
-		 if (yDis > 5) {
-		   this.vy = this.dy - this.y;
-		} else {
-			this.vy = 0;
-		}		 
-    };
-	
-	this.setDestination = function(nextX,nextY) {
-		this.dx = nextX;
-		this.dy = nextY;
-    };
+	// this.update = function() {
+		// var xDis = Math.abs(this.x - this.dx)
+		// var yDis = Math.abs(this.y - this.dy)
+		 // if ( xDis > 5) {
+			// this.vx = this.dx - this.x;
+		 // } else {
+			// this.vx = 0;
+		 // }
+// 		 
+		 // if (yDis > 5) {
+		   // this.vy = this.dy - this.y;
+		// } else {
+			// this.vy = 0;
+		// }		 
+    // };
+// 	
+	// this.setDestination = function(nextX,nextY) {
+		// this.dx = nextX;
+		// this.dy = nextY;
+    // };
 	
 	this.norm = function () {
         var z = Math.sqrt(this.vx * this.vx + this.vy * this.vy );
@@ -99,6 +107,7 @@ function PlayerBall(x,y,vx,vy,radius,color)
 			this.vx *= z;
 			this.vy *= z;
 		}
+		//console.log(this.vx + "--" + this.vy)
     };
 	
 }

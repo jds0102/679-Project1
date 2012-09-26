@@ -17,6 +17,9 @@ SETUP CONSTANTS
 	var theCanvas = document.getElementById("mycanvas");
 	var theContext = theCanvas.getContext("2d");
 	
+	var userInput = new Array(false,false,false,false); 
+	// Order of storage is UP,DOWN,LEFT,RIGHT; Stored as booleans
+	
 	var score = 0;
 	var currentFlock =1;
 	var flockCount = 1;
@@ -27,7 +30,8 @@ SETUP CONSTANTS
     var player = new PlayerBall(450,220,8,8,5,"#00FF00");
     var food = new Ball(100,100,0,0,8,"099000");
 	var minDistance = (player.radius+food.radius)*(player.radius+food.radius);
-    var te = new EnemyBall(50+Math.random()*500, 50+Math.random()*500,2,2,5, flockColor);	
+    var te = new EnemyBall(50+Math.random()*500, 50+Math.random()*500,2,2,5, flockColor);
+    	
 	te.flock = currentFlock;
 	theBalls = []; //The array of all the balls
 	theBalls.push(te);
@@ -188,7 +192,7 @@ SETUP CONSTANTS
     }
     function updateObjects()
 	{
-		player.update();
+		updatePlayer(); 
 		player.norm();
 		player.move();
 	    //first we need to set the correct place to follow
@@ -210,14 +214,65 @@ SETUP CONSTANTS
 	
 	function doClick(evt){
         
-        player.setDestination(evt.pageX - theCanvas.offsetLeft,
-        evt.pageY - theCanvas.offsetTop);
+     
     }
 	
-    function keyPressed(evt){
-		//player.move(evt.keyCode);
+	function keyPressed(evt){
+		switch (evt.keyCode) {
+		case 37: //left
+			userInput[2] = true;
+			break;
+		case 38: //up
+			userInput[0] = true;
+			break;
+		case 39: //right
+			userInput[3] = true;
+			break;
+		case 40: //down
+			userInput[1] = true;
+			break;
+		}
+    }
+	
+    function keyReleased(evt){
+		switch (evt.keyCode) {
+		case 37: //left
+			userInput[2] = false;
+			break;
+		case 38: //up
+			userInput[0] = false;
+			break;
+		case 39: //right
+			userInput[3] = false;
+			break;
+		case 40: //down
+			userInput[1] = false;
+			break;
+		}
     }
 
+	//Returns an array that contains the vector of the players 
+	//movement. X is at position 0, Y is at 1
+	function updatePlayer(){
+		var x = 0;
+		var y = 0;
+		if (userInput[0]){
+			y --;
+		} 
+		if (userInput[1]){
+			y ++;
+		}
+		if (userInput[2]){
+			x --;
+		}
+		if (userInput[3]){
+			x ++;
+		}	
+		console.log(x + "," + y);
+		player.setVelocity(x,y);
+		
+	}
+	
     // what we need to do is define a function that updates the position
     // draws, then schedules another iteration in the future
     // WARNING: this is the simplest, but not the best, way to do this
@@ -230,7 +285,7 @@ SETUP CONSTANTS
 		
 	//Add the event Listeners
     window.addEventListener('keydown',keyPressed,true);
-	window.addEventListener('keyup',keyPressed,true);
+	window.addEventListener('keyup',keyReleased,true);
     theCanvas.addEventListener("click",doClick,false);
 	//Start the Game
     drawLoop();
