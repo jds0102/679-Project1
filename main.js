@@ -21,42 +21,76 @@ SETUP CONSTANTS
 	// Order of storage is UP,DOWN,LEFT,RIGHT; Stored as booleans
 	
 	var score = 0;
-	var currentFlock =1;
-	var flockCount = 1;
-	var flockColor = "FF0000";
+	
+	var currentFlock =0;
+	var flockCount = 0;
 	
 	var radius = 5;
-	
-    var player = new PlayerBall(450,220,8,8,5,"#00FF00");
-    var food = new Ball(100,100,0,0,8,"099000");
+		
+	var theBalls = []; //The array of all the balls. Only used for bouncing
+	var theFlocks =[]; //Seperate for faster alignment.
+
+	var player = new PlayerBall(450,220,8,8,5,"#00FF00");
+    var food = new Ball(100,100,0,0,8,"#099000");
 	var minDistance = (player.radius+food.radius)*(player.radius+food.radius);
-    var te = new EnemyBall(50+Math.random()*500, 50+Math.random()*500,2,2,5, flockColor);
-    	
-	te.flock = currentFlock;
-	theBalls = []; //The array of all the balls
-	theBalls.push(te);
+    var debug = true;
     function updateScore(score)
 	{
 	    document.getElementById("score").innerHTML = "Score: "+score;
 	}
+	function generateBall()
+	{
+	    b = new EnemyBall(50+Math.random()*500, 50+Math.random()*500,2,2,5, "#FFFFFF");
+	    if(currentFlock == 0 && flockCount == 0)
+		{
+			var firstFlock = new Flock('#'+Math.floor(Math.random()*16777215).toString(16));
+			theFlocks.push(firstFlock);
+			theFlocks[currentFlock].addBall(b);
+			flockCount++;
+		}
+		else if(flockCount<10)
+		{
+		   //get out the first ball and try to place us close to them
+		   var first = theFlocks[currentFlock].balls[0];
+		   
+		   b.x = first.x + (Math.random()*radius*14-radius*7);
+		   b.y = first.y + (Math.random()*radius*14-radius*7);
+		   theFlocks[currentFlock].addBall(b);
+		   flockCount++;
+		}
+		else
+		{
+		   var tempFlock = new Flock('#'+Math.floor(Math.random()*16777215).toString(16));
+		   tempFlock.addBall(b);
+		   theFlocks.push(tempFlock);
+		   flockCount = 1;
+		   currentFlock++;
+		}
+		theBalls.push(b);
+	}
 	//I use this for testing. we can turn it off later.
 	function gameInitialize()
 	{
-	updateScore(score);
-	theBalls = new Array();
-	   for(var flock = 0; flock < 3; flock++)
-	   {
-	       //found this online. sorta understand how it works 16777215 = FFFFFF
-	       color = '#'+Math.floor(Math.random()*16777215).toString(16);
-	       for (var i=0; i<10; i++) {
-		      //I found the random color thing online
-              b = new EnemyBall(50+Math.random()*500, 50+Math.random()*500,2,2,5, color);
-              theBalls.push(b)
-		      b.flock = flock;
+	    updateScore(score);
+	    theBalls = new Array();
+		theFlocks = new Array();
+		
+		theBalls.push(player);
+		
+		if(debug)
+		{
+			for(var balls = 0; balls < 150; balls++)
+			{
+				generateBall();
             }
+	     
+	   }
+	   else
+	   {
+	        generateBall();
 	   }
 	}
-	//gameInitialize()
+	gameInitialize();
 	
     function bounce(ballList) {
         var rad = 2 * radius;
@@ -84,61 +118,6 @@ SETUP CONSTANTS
             }
         }
     }
-
-	// Reynold's like alignment
-    // each boid tries to make it's velocity to be similar to its neighbors
-    // recipricol falloff in weight (allignment parameter + d
-    // this assumes the velocities will be renormalized
-    function align(ballList)
-    {
-        var ali = 3; // alignment parameter - between 0 and 1
-    
-        // make temp arrays to store results
-        // this is inefficient, but the goal here is to make it work first
-        var newVX = new Array(ballList.length);
-        var newVY = new Array(ballList.length);
-    
-        // do the n^2 loop over all pairs, and sum up the contribution of each
-        for(var i=ballList.length-1; i>=0; i--) {
-            var bi = ballList[i];
-			if(!bi.isLeader)
-			{
-            var bix = bi.x;
-            var biy = bi.y;
-            newVX[i] = 0;
-            newVY[i] = 0;
-			
-            for(var j=ballList.length-1; j>=0; j--) {
-                var bj = ballList[j];
-				if(bj.flock == bi.flock)
-				{
-                // compute the distance for falloff
-                var dx = bj.x - bix;
-                var dy = bj.y - biy;
-                var d = Math.sqrt(dx*dx+dy*dy);
-                // add to the weighted sum
-                newVX[i] += (bj.vx / (d+ali));
-                newVY[i] += (bj.vy / (d+ali));
-				}
-				
-            }
-			}
-			 var dx = player.x - bix;
-                var dy = player.y - biy;
-                var d = Math.sqrt(dx*dx+dy*dy);
-                // add to the weighted sum
-                newVX[i] += (player.vx / (d+10));
-                newVY[i] += (player.vy / (d+10));
-        }
-        for(var i=ballList.length-1; i>=0; i--) {
-		    if(!ballList[i].isLeader)
-			{
-				ballList[i].vx = newVX[i];
-				ballList[i].vy = newVY[i];
-			}
-        } 
-    }
-
 	function checkFood()
 	{
         var d = (player.x-food.x)*(player.x-food.x) +(player.y-food.y)*(player.y-food.y);
@@ -147,17 +126,8 @@ SETUP CONSTANTS
 		    updateScore(++score);
             food.x = 50+Math.random()*500;
 			food.y = 50+Math.random()*500;
-			var n = new EnemyBall(50+Math.random()*500, 50+Math.random()*500,2,2,5, flockColor);
-			n.flock = currentFlock;
-			flockCount++;
-			theBalls.push(n);
-			
-			if(flockCount >=10)
-			{
-			   flockColor = '#'+Math.floor(Math.random()*16777215).toString(16);
-			   flockCount = 0;
-			   currentFlock++;
-			}
+
+			generateBall();
         }
 	}
     function checkDeath()
@@ -187,7 +157,6 @@ SETUP CONSTANTS
 	    {
 		    theBalls[i].draw();
 		}
-		player.draw();
 		food.draw();
     }
     function updateObjects()
@@ -195,27 +164,33 @@ SETUP CONSTANTS
 		updatePlayer(); 
 		player.norm();
 		player.move();
-	    //first we need to set the correct place to follow
-	    for(var i = 0; i < theBalls.length; i++)
+		
+		for(var i = theFlocks.length-1; i >=0 ; i--)
 		{
-		   //theBalls[i].follow();
+		   theFlocks[i].align();
+		   theFlocks[i].norm();
+		   for(var j = i-1; j>=0; j--)
+		   {
+		      theFlocks[i].repel(theFlocks[j]);
+		   }
+		   theFlocks[i].norm();
+		}
+		bounce(theBalls);
+	    //first we need to set the correct place to follow
+	    for(var i = 0; i < theFlocks.length; i++)
+		{
+		   theFlocks[i].update();
 		}
 		//Then we need to adjust the flock to the direction of the leader
-		align(theBalls);
-	    bounce(theBalls);
-        for(var i = 0; i < theBalls.length; i++)
-		{
-		    theBalls[i].norm();
-		    theBalls[i].move();
-		}
+		//align(theBalls);
+	    
+
 		checkFood();
-		checkDeath();
+		//checkDeath();
 	}
 	
 	function doClick(evt){
-        
-     
-    }
+}
 	
 	function keyPressed(evt){
 		switch (evt.keyCode) {

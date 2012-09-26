@@ -5,7 +5,7 @@ var theContext = theCanvas.getContext("2d");
 var ballcolor = "#FFFF00";      // yellow fill
 var ballstroke = "#000000";     // black outline
 var circ = Math.PI*2;
- 
+var enemySpeed =1.0;
 //A generic Ball. Has position, speed, radius and color
 //Can only draw, move and bounces to stay on the canvas
 function Ball(x,y,vx,vy,radius,color)
@@ -19,7 +19,7 @@ function Ball(x,y,vx,vy,radius,color)
 	
     this.norm = function () {
         var z = Math.sqrt(this.vx * this.vx + this.vy * this.vy );
-        z = 1.0 / z;
+        z = enemySpeed / z;
         this.vx *= z;
 	    this.vy *= z;
     };
