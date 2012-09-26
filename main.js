@@ -1,7 +1,3 @@
-//So we wait for the window to completly load before doing this. But the place
-//ment of the include depicts it gets loaded last. not Necessary?
-window.onload = function() {
-
 /*
 SETUP CONSTANTS
 */
@@ -31,7 +27,7 @@ SETUP CONSTANTS
 	var theFlocks =[]; //Seperate for faster alignment.
 
 	var player = new PlayerBall(450,220,8,8,5,"#00FF00");
-    var food = new Ball(100,100,0,0,8,"#099000");
+    var food = new Ball(10,10,0,0,8,"#099000");
 	var minDistance = (player.radius+food.radius)*(player.radius+food.radius);
     var debug = true;
     function updateScore(score)
@@ -69,28 +65,29 @@ SETUP CONSTANTS
 		theBalls.push(b);
 	}
 	//I use this for testing. we can turn it off later.
-	function gameInitialize()
+	function gameInitialize(type)
 	{
-	    updateScore(score);
+	    updateScore(0);
 	    theBalls = new Array();
 		theFlocks = new Array();
 		
-		theBalls.push(player);
+		currentFlock = 0;
+		flockCount = 0;
 		
-		if(debug)
+		if(type == "intro")
 		{
-			for(var balls = 0; balls < 150; balls++)
+			for(var balls = 0; balls < 50; balls++)
 			{
 				generateBall();
-            }
-	     
+            }    
 	   }
 	   else
 	   {
+	        theBalls.push(food);
+			theBalls.push(player);
 	        generateBall();
 	   }
 	}
-	gameInitialize();
 	
     function bounce(ballList) {
         var rad = 2 * radius;
@@ -157,7 +154,6 @@ SETUP CONSTANTS
 	    {
 		    theBalls[i].draw();
 		}
-		food.draw();
     }
     function updateObjects()
 	{
@@ -247,21 +243,19 @@ SETUP CONSTANTS
 		player.setVelocity(x,y);
 		
 	}
-	
-    // what we need to do is define a function that updates the position
-    // draws, then schedules another iteration in the future
-    // WARNING: this is the simplest, but not the best, way to do this
-	alert("This is how you play");
     function drawLoop() {
 		updateObjects();
         drawObjects();
         reqFrame(drawLoop);
     }
+	
+	function setupNewGame()
+	{
+		//Add the event Listeners
+		window.addEventListener('keydown',keyPressed,true);
+		window.addEventListener('keyup',keyReleased,true);
+		theCanvas.addEventListener("click",doClick,false);
 		
-	//Add the event Listeners
-    window.addEventListener('keydown',keyPressed,true);
-	window.addEventListener('keyup',keyReleased,true);
-    theCanvas.addEventListener("click",doClick,false);
-	//Start the Game
-    drawLoop();
-}
+		gameInitialize();
+		drawLoop();
+	}

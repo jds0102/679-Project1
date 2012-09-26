@@ -1,6 +1,3 @@
-/*Keep a ratio of how much the direction affects us when we combine*/
-var percentPlayer = .2;
-var percentFlock = .8;
 
 function Flock(color)
 {
