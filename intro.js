@@ -13,23 +13,18 @@ death.src = 'death.png';
 var enter = new Image();   // Create new img element
 enter.src = 'enter.png';
 
-function drawText()
-{
-    theContext.drawImage(title, 60,80);
-	theContext.drawImage(control,110,180);
-	theContext.drawImage(instruct1,110,240);
-	theContext.drawImage(death,138,290);
-	theContext.drawImage(enter,95,430);
-}
-function introLoop()
-{
-	updateObjects();
-	drawObjects();
-	drawText();
-	reqFrame(introLoop);
 
-}
-
-window.addEventListener('keydown',switchState,true);
 gameInitialize("intro");
-introLoop();
+
+function gameLoop()
+{
+    theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
+	for(var index = 0; index<funcArray.length; index++)
+	{
+		funcArray[index].call();
+	}
+	reqFrame(gameLoop);
+}
+	window.addEventListener('keydown',keyPressed,true);
+	window.addEventListener('keyup',keyReleased,true);
+gameLoop();

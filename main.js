@@ -84,25 +84,6 @@ SETUP CONSTANTS
 	   }
 	}
 	
-	function switchState(evt)
-	{
-	    if(evt.keyCode == 13)
-		{
-		    if(gameState == "intro")
-			{ 
-			    gameState = "playing";
-				setupNewGame();
-			}
-			else if(gameState == "gameover")
-			{
-			    score = 0;
-			    gameState = 'intro';
-				gameInitialize("intro");
-				introLoop();
-			}
-		}
-	}
-	
     function bounce(ballList) {
         var rad = 2 * radius;
         rad = rad*rad;
@@ -129,6 +110,32 @@ SETUP CONSTANTS
             }
         }
     }
+		
+	var GameOver = new Image()
+	GameOver.src = "GameOver.png";
+	
+	var finalScore = new Image()
+	finalScore.src = "finalScore.png";
+	function drawGameOver()
+	{
+	   theContext.drawImage(GameOver,160,180);
+	   theContext.drawImage(finalScore,110,350);
+	   
+	    theContext.strokeStye = "#000000";
+	   	theContext.fillStyle = '#D9D919';
+		theContext.font = 'italic bold 50px sans-serif';
+		theContext.textBaseline = 'bottom';
+		if(score >= 10)
+		{
+		 theContext.fillText(score, 390, 410);
+		 theContext.strokeText(score, 390, 410);
+		 }
+		else
+		{
+		 theContext.fillText(score, 390, 410);
+		 theContext.strokeText(score, 390, 410);
+		}
+	}
 	function checkFood()
 	{
         var d = (player.x-food.x)*(player.x-food.x) +(player.y-food.y)*(player.y-food.y);
@@ -154,7 +161,9 @@ SETUP CONSTANTS
 			var dy = player.y - biy;
             var d = dx*dx+dy*dy;
             if (!(bi.x == player.x && bi.y == player.y) && d < rad) {
-				gameState = "gameover";
+				gameState = "gameOver";
+				funcArray.shift();
+				funcArray.push(drawGameOver);
             }
         }
 	}
@@ -170,10 +179,6 @@ SETUP CONSTANTS
 	}
     // this function will do the drawing
     function drawObjects() {
-        // clear the window
-        theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
-		if(gameState == "playing")
-			drawScore();
         // draw the balls - too bad we can't use for i in theBalls
 		for(var i = 0; i < theBalls.length; i++)
 	    {
@@ -205,11 +210,25 @@ SETUP CONSTANTS
 		//Then we need to adjust the flock to the direction of the leader
 		//align(theBalls);
 	    
-
-		checkFood();
-		checkDeath();
+		if(gameState == "playing")
+		{
+			checkFood();
+			checkDeath();
+		}
 	}
-	
+	function drawText()
+{
+    theContext.drawImage(title, 60,80);
+	theContext.drawImage(control,110,180);
+	theContext.drawImage(instruct1,110,240);
+	theContext.drawImage(death,138,290);
+	theContext.drawImage(enter,95,430);
+}
+	var funcArray = [
+	updateObjects,
+	drawObjects,
+	drawText
+];
 	function doClick(evt){
 }
 	
@@ -227,12 +246,27 @@ SETUP CONSTANTS
 		case 40: //down
 			userInput[1] = true;
 			break;
+		case 13:
+		{
+			if(gameState == "intro")
+			{
+				gameState ="playing";
+				funcArray.pop();
+				funcArray.unshift(drawScore);
+				gameInitialize();
+			}
+			else if(gameState == "gameOver")
+			{
+				gameState = "intro";
+				funcArray.pop();
+				funcArray.push(drawText);
+				gameInitialize("intro");
+			}
 		}
-    }
+		}
+	}
 	
     function keyReleased(evt){
-	    if(gameState='playing')
-		{
 			switch (evt.keyCode) {
 			case 37: //left
 				userInput[2] = false;
@@ -247,7 +281,7 @@ SETUP CONSTANTS
 				userInput[1] = false;
 				break;
 			}
-		}
+		
     }
 
 	//Returns an array that contains the vector of the players 
@@ -278,70 +312,4 @@ SETUP CONSTANTS
 			y = 0;
 		}
 		player.setVelocity(x,y);		
-	}
-	
-	var GameOver = new Image()
-	GameOver.src = "GameOver.png";
-	
-	var finalScore = new Image()
-	finalScore.src = "finalScore.png";
-	function drawGameOver()
-	{
-	   theContext.drawImage(GameOver,160,180);
-	   theContext.drawImage(finalScore,110,350);
-	   
-	    theContext.strokeStye = "#000000";
-	   	theContext.fillStyle = '#D9D919';
-		theContext.font = 'italic bold 50px sans-serif';
-		theContext.textBaseline = 'bottom';
-		if(score >= 10)
-		{
-		 theContext.fillText(score, 390, 410);
-		 theContext.strokeText(score, 390, 410);
-		 }
-		else
-		{
-		 theContext.fillText(score, 390, 410);
-		 theContext.strokeText(score, 390, 410);
-		}
-	}
-	function gameOverLoop()
-	{
-	    if(gameState == "gameover")
-		{
-			updateObjects();
-			drawObjects();
-			drawGameOver();
-			reqFrame(gameOverLoop);
-		}
-	}
-    function drawLoop() {
-	    if(gameState == "playing")
-		{
-			updateObjects();
-			drawObjects();
-			reqFrame(drawLoop);
-		}
-		else
-		{
-		    for( i = 0; i < userInput.length; i++)
-			{
-			   userInput[i] = 0;
-			}
-			window.removeEventListener('keydown',keyPressed,true);
-			window.removeEventListener('keyup',keyReleased,true);
-			window.addEventListener('keydown',switchState,true);
-			gameOverLoop();
-		}
-    }
-	
-	function setupNewGame()
-	{
-		window.removeEventListener('keydown',switchState,true);
-		window.addEventListener('keydown',keyPressed,true);
-		window.addEventListener('keyup',keyReleased,true);
-		theCanvas.addEventListener("click",doClick,false);
-		
-		gameInitialize();
-		drawLoop();
 	}
