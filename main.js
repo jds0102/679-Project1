@@ -15,7 +15,7 @@ SETUP CONSTANTS
 	
 	var userInput = new Array(false,false,false,false); 
 	// Order of storage is UP,DOWN,LEFT,RIGHT; Stored as booleans
-	
+	var gameState = "intro";
 	var score = 0;
 	
 	var currentFlock =0;
@@ -27,13 +27,9 @@ SETUP CONSTANTS
 	var theFlocks =[]; //Seperate for faster alignment.
 
 	var player = new PlayerBall(450,220,8,8,5,"#00FF00");
-    var food = new Ball(10,10,0,0,8,"#099000");
+    var food = new Ball(10,10,0,0,8,"#D9D919");
 	var minDistance = (player.radius+food.radius)*(player.radius+food.radius);
-    var debug = true;
-    function updateScore(score)
-	{
-	    document.getElementById("score").innerHTML = "Score: "+score;
-	}
+	
 	function generateBall()
 	{
 	    b = new EnemyBall(50+Math.random()*500, 50+Math.random()*500,2,2,5, "#FFFFFF");
@@ -67,7 +63,6 @@ SETUP CONSTANTS
 	//I use this for testing. we can turn it off later.
 	function gameInitialize(type)
 	{
-	    updateScore(0);
 	    theBalls = new Array();
 		theFlocks = new Array();
 		
@@ -87,6 +82,25 @@ SETUP CONSTANTS
 			theBalls.push(player);
 	        generateBall();
 	   }
+	}
+	
+	function switchState(evt)
+	{
+	    if(evt.keyCode == 13)
+		{
+		    if(gameState == "intro")
+			{ 
+			    gameState = "playing";
+				setupNewGame();
+			}
+			else if(gameState == "gameover")
+			{
+			    score = 0;
+			    gameState = 'intro';
+				gameInitialize("intro");
+				introLoop();
+			}
+		}
 	}
 	
     function bounce(ballList) {
@@ -120,7 +134,7 @@ SETUP CONSTANTS
         var d = (player.x-food.x)*(player.x-food.x) +(player.y-food.y)*(player.y-food.y);
 		
         if (d < minDistance) {
-		    updateScore(++score);
+		    score++;
             food.x = 50+Math.random()*500;
 			food.y = 50+Math.random()*500;
 
@@ -139,16 +153,27 @@ SETUP CONSTANTS
 			var dx = player.x - bix;
 			var dy = player.y - biy;
             var d = dx*dx+dy*dy;
-            if (d < rad) {
-                alert("you Dead son");
-				gameInitialize();
+            if (!(bi.x == player.x && bi.y == player.y) && d < rad) {
+				gameState = "gameover";
             }
         }
+	}
+	function drawScore()
+	{
+		theContext.fillStyle = '#CCCCCC';
+		theContext.font = 'italic bold 200px sans-serif';
+		theContext.textBaseline = 'bottom';
+		if(score >= 10)
+		 theContext.fillText(score, 170, 400);
+		 else
+		 theContext.fillText(score, 240, 400);
 	}
     // this function will do the drawing
     function drawObjects() {
         // clear the window
         theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
+		if(gameState == "playing")
+			drawScore();
         // draw the balls - too bad we can't use for i in theBalls
 		for(var i = 0; i < theBalls.length; i++)
 	    {
@@ -182,7 +207,7 @@ SETUP CONSTANTS
 	    
 
 		checkFood();
-		//checkDeath();
+		checkDeath();
 	}
 	
 	function doClick(evt){
@@ -206,19 +231,22 @@ SETUP CONSTANTS
     }
 	
     function keyReleased(evt){
-		switch (evt.keyCode) {
-		case 37: //left
-			userInput[2] = false;
-			break;
-		case 38: //up
-			userInput[0] = false;
-			break;
-		case 39: //right
-			userInput[3] = false;
-			break;
-		case 40: //down
-			userInput[1] = false;
-			break;
+	    if(gameState='playing')
+		{
+			switch (evt.keyCode) {
+			case 37: //left
+				userInput[2] = false;
+				break;
+			case 38: //up
+				userInput[0] = false;
+				break;
+			case 39: //right
+				userInput[3] = false;
+				break;
+			case 40: //down
+				userInput[1] = false;
+				break;
+			}
 		}
     }
 
@@ -239,19 +267,67 @@ SETUP CONSTANTS
 		if (userInput[3]){
 			x ++;
 		}	
-		console.log(x + "," + y);
-		player.setVelocity(x,y);
-		
+		player.setVelocity(x,y);		
+	}
+	
+	var GameOver = new Image()
+	GameOver.src = "GameOver.png";
+	
+	var finalScore = new Image()
+	finalScore.src = "finalScore.png";
+	function drawGameOver()
+	{
+	   theContext.drawImage(GameOver,160,180);
+	   theContext.drawImage(finalScore,110,350);
+	   
+	    theContext.strokeStye = "#000000";
+	   	theContext.fillStyle = '#D9D919';
+		theContext.font = 'italic bold 50px sans-serif';
+		theContext.textBaseline = 'bottom';
+		if(score >= 10)
+		{
+		 theContext.fillText(score, 390, 410);
+		 theContext.strokeText(score, 390, 410);
+		 }
+		else
+		{
+		 theContext.fillText(score, 390, 410);
+		 theContext.strokeText(score, 390, 410);
+		}
+	}
+	function gameOverLoop()
+	{
+	    if(gameState == "gameover")
+		{
+			updateObjects();
+			drawObjects();
+			drawGameOver();
+			reqFrame(gameOverLoop);
+		}
 	}
     function drawLoop() {
-		updateObjects();
-        drawObjects();
-        reqFrame(drawLoop);
+	    if(gameState == "playing")
+		{
+			updateObjects();
+			drawObjects();
+			reqFrame(drawLoop);
+		}
+		else
+		{
+		    for( i = 0; i < userInput.length; i++)
+			{
+			   userInput[i] = 0;
+			}
+			window.removeEventListener('keydown',keyPressed,true);
+			window.removeEventListener('keyup',keyReleased,true);
+			window.addEventListener('keydown',switchState,true);
+			gameOverLoop();
+		}
     }
 	
 	function setupNewGame()
 	{
-		//Add the event Listeners
+		window.removeEventListener('keydown',switchState,true);
 		window.addEventListener('keydown',keyPressed,true);
 		window.addEventListener('keyup',keyReleased,true);
 		theCanvas.addEventListener("click",doClick,false);

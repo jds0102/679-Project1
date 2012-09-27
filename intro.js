@@ -1,41 +1,35 @@
+var title = new Image();   // Create new img element
+title.src = 'Title.png';
+
+var control = new Image();   // Create new img element
+control.src = 'Control.png';
+
+var instruct1 = new Image();   // Create new img element
+instruct1.src = 'Intruct1.png';
+
+var death = new Image();   // Create new img element
+death.src = 'death.png';
+
+var enter = new Image();   // Create new img element
+enter.src = 'enter.png';
+
 function drawText()
 {
-	theContext.fillStyle = '#f00';
-	theContext.font = 'italic bold 30px sans-serif';
-	theContext.textBaseline = 'bottom';
-	theContext.fillText('Flock Avoider', 50, 100);
-	
-	theContext.fillStyle = '#f00';
-	theContext.font = 'italic bold 30px sans-serif';
-	theContext.textBaseline = 'bottom';
-	theContext.fillText('Arrow Keys To Move', 50, 200);
-	
-	theContext.fillStyle = '#f00';
-	theContext.font = 'italic bold 30px sans-serif';
-	theContext.textBaseline = 'bottom';
-	theContext.fillText('Dont Touch The Other Balls', 50, 300);
-	
-	theContext.fillStyle = '#f00';
-	theContext.font = 'italic bold 30px sans-serif';
-	theContext.textBaseline = 'bottom';
-	theContext.fillText('Press Enter To Start', 50, 400);
-}
-function introKeys(evt)
-{
-	if(evt.keyCode == 13)
-	{
-	    window.removeEventListener('keydown',introKeys,true);
-	    setupNewGame();
-	}
+    theContext.drawImage(title, 60,80);
+	theContext.drawImage(control,110,180);
+	theContext.drawImage(instruct1,110,240);
+	theContext.drawImage(death,138,290);
+	theContext.drawImage(enter,95,430);
 }
 function introLoop()
 {
 	updateObjects();
-    drawObjects();
-    drawText();
+	drawObjects();
+	drawText();
 	reqFrame(introLoop);
-}
-window.addEventListener('keydown',introKeys,true);
 
+}
+
+window.addEventListener('keydown',switchState,true);
 gameInitialize("intro");
 introLoop();
