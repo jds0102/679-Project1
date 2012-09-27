@@ -60,6 +60,14 @@ function Ball(x,y,vx,vy,radius,color)
 		}
     };
     
+    this.getX = function(){
+    	return this.x;
+    }
+    
+    this.getY = function(){
+    	return this.y;
+    }
+    
     this.setVelocity = function(newVX, newVY) {
     	this.vx = newVX;
     	this.vy = newVY;

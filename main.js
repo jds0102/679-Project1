@@ -267,6 +267,16 @@ SETUP CONSTANTS
 		if (userInput[3]){
 			x ++;
 		}	
+		if (player.getX() > 595 && x > 0) {
+			x = 0;
+		} else if (player.getX() < 5 && x < 0) {
+			x = 0;
+		}
+		if (player.getY() > 595 && y > 0) {
+			y = 0;
+		} else if (player.getY() < 5 && y < 0) {
+			y = 0;
+		}
 		player.setVelocity(x,y);		
 	}
 	
