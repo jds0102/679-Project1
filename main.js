@@ -170,7 +170,9 @@ SETUP CONSTANTS
 			food.y = 50+Math.random()*500;
 
 			generateBall();
-			generateBall();
+			if (score < 15) {
+				generateBall();
+			}
         }
 	}
 	
