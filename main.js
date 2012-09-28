@@ -28,7 +28,16 @@ SETUP CONSTANTS
 
 	var player = new PlayerBall(450,220,8,8,5,"#00FF00");
     var food = new Ball(10,10,0,0,8,"#D9D919");
+    var powerup = new Powerup(100, 100, 10, "#FF0000");
 	var minDistance = (player.radius+food.radius)*(player.radius+food.radius);
+	var minPowerupDistance = (player.radius+powerup.radius)*(player.radius+powerup.radius);
+	
+	
+	var powerupStart = 0.0;
+	var powerupActive = false;
+	var powerupDisplayed = true;
+	
+	var currentDate = new Date();
 	
 	function generateBall()
 	{
@@ -80,6 +89,7 @@ SETUP CONSTANTS
 	   {
 	        theBalls.push(food);
 			theBalls.push(player);
+			theBalls.push(powerup);
 	        generateBall();
 	   }
 	}
@@ -148,6 +158,19 @@ SETUP CONSTANTS
 			generateBall();
         }
 	}
+	
+	function checkPowerup()
+	{
+		if (powerupDisplayed == true){
+			var distance = (player.x-powerup.x)*(player.x-powerup.x) +(player.y-powerup.y)*(player.y-powerup.y);
+			if (distance < minPowerupDistance) {
+				powerupActive = true; 
+				powerupDisplayed = false;
+				powerupStart = new Date().getTime();
+			}
+		}
+	}
+	
     function checkDeath()
 	{
         var rad = 2 * radius;
@@ -155,6 +178,9 @@ SETUP CONSTANTS
         
         for(var i=theBalls.length-1; i>=0; i--) {
             var bi = theBalls[i];
+            if (bi == powerup) {
+            	continue;
+            }
             var bix = bi.x;
             var biy = bi.y;
 			var dx = player.x - bix;
@@ -182,7 +208,13 @@ SETUP CONSTANTS
         // draw the balls - too bad we can't use for i in theBalls
 		for(var i = 0; i < theBalls.length; i++)
 	    {
-		    theBalls[i].draw();
+	    	if (theBalls[i] == powerup) {
+	    		if (powerupDisplayed == true) {
+	    			theBalls[i].draw();
+	    		}
+	    	} else {
+		    	theBalls[i].draw();
+		    }
 		}
     }
     function updateObjects()
@@ -190,22 +222,25 @@ SETUP CONSTANTS
 		updatePlayer(); 
 		player.norm();
 		player.move();
+
 		
-		for(var i = theFlocks.length-1; i >=0 ; i--)
-		{
-		   theFlocks[i].align();
-		   theFlocks[i].norm();
-		   for(var j = i-1; j>=0; j--)
-		   {
-		      theFlocks[i].repel(theFlocks[j]);
-		   }
-		   theFlocks[i].norm();
-		}
-		bounce(theBalls);
-	    //first we need to set the correct place to follow
-	    for(var i = 0; i < theFlocks.length; i++)
-		{
-		   theFlocks[i].update();
+		if (powerupActive == false) {
+			for(var i = theFlocks.length-1; i >=0 ; i--)
+			{
+			   theFlocks[i].align();
+			   theFlocks[i].norm();
+			   for(var j = i-1; j>=0; j--)
+			   {
+			      theFlocks[i].repel(theFlocks[j]);
+			   }
+			   theFlocks[i].norm();
+			}
+			bounce(theBalls);
+		    //first we need to set the correct place to follow
+		    for(var i = 0; i < theFlocks.length; i++)
+			{
+			   theFlocks[i].update();
+			}
 		}
 		//Then we need to adjust the flock to the direction of the leader
 		//align(theBalls);
@@ -214,6 +249,14 @@ SETUP CONSTANTS
 		{
 			checkFood();
 			checkDeath();
+			if (powerupActive == true) {
+				if (((new Date().getTime()) - powerupStart) > 5000) {
+					powerupActive = false;
+				}
+			} else {
+				powerupDisplayed = true;
+				checkPowerup();
+			}
 		}
 	}
 	function drawText()

@@ -136,3 +136,15 @@ function EnemyBall(x,y,vx,vy,radius,color)
     };
 }
 
+Powerup.prototype = new Ball();
+
+function Powerup(x, y, radius, color) 
+{
+	this.x = x;
+	this.y = y;
+	this.color = color;
+	this.radius = radius;
+		
+}
+
+
