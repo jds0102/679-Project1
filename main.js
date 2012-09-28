@@ -21,6 +21,7 @@ SETUP CONSTANTS
 	var currentFlock =0;
 	var flockCount = 0;
 	
+	var lives = 3;
 	var radius = 5;
 		
 	var theBalls = []; //The array of all the balls. Only used for bouncing
@@ -161,9 +162,9 @@ SETUP CONSTANTS
 			var dy = player.y - biy;
             var d = dx*dx+dy*dy;
             if (!(bi.x == player.x && bi.y == player.y) && d < rad) {
-				gameState = "gameOver";
-				funcArray.shift();
-				funcArray.push(drawGameOver);
+					gameState = "gameOver";
+					funcArray.shift();
+					funcArray.push(drawGameOver);
             }
         }
 	}
@@ -172,10 +173,12 @@ SETUP CONSTANTS
 		theContext.fillStyle = '#CCCCCC';
 		theContext.font = 'italic bold 200px sans-serif';
 		theContext.textBaseline = 'bottom';
-		if(score >= 10)
-		 theContext.fillText(score, 170, 400);
-		 else
+		if(score <10)
 		 theContext.fillText(score, 240, 400);
+		else if(score<100)
+		 theContext.fillText(score, 170, 400);
+		else
+		 theContext.fillText(score, 120, 400);
 	}
     // this function will do the drawing
     function drawObjects() {
