@@ -13,6 +13,8 @@ SETUP CONSTANTS
 	var theCanvas = document.getElementById("mycanvas");
 	var theContext = theCanvas.getContext("2d");
 	
+	//var ballColors
+	
 	var userInput = new Array(false,false,false,false); 
 	// Order of storage is UP,DOWN,LEFT,RIGHT; Stored as booleans
 	var gameState = "intro";
@@ -29,14 +31,14 @@ SETUP CONSTANTS
 
 	var player = new PlayerBall(450,220,8,8,5,"#00FF00");
     var food = new Ball(10,10,0,0,8,"#D9D919");
-    var powerup = new Powerup(100, 100, 10, "#FF0000");
+    var powerup = new Powerup((Math.random() * 550) + 5,(Math.random() * 550) + 5, 10, "#2C75FF");
 	var minDistance = (player.radius+food.radius)*(player.radius+food.radius);
 	var minPowerupDistance = (player.radius+powerup.radius)*(player.radius+powerup.radius);
 	
 	
 	var powerupStart = 0.0;
 	var powerupActive = false;
-	var powerupDisplayed = true;
+	var powerupDisplayed = false;
 	
 	var currentDate = new Date();
 	
@@ -91,7 +93,9 @@ SETUP CONSTANTS
 	        theBalls.push(food);
 			theBalls.push(player);
 			theBalls.push(powerup);
-	        generateBall();
+			for (i = 0; i < 25; i ++) {
+				generateBall();
+			}
 	   }
 	}
 	
@@ -167,6 +171,8 @@ SETUP CONSTANTS
 			if (distance < minPowerupDistance) {
 				powerupActive = true; 
 				powerupDisplayed = false;
+				powerup.x = (Math.random() * 550) + 5;
+				powerup.y = (Math.random() * 550) + 5;
 				powerupStart = new Date().getTime();
 			}
 		}
@@ -226,7 +232,7 @@ SETUP CONSTANTS
 		player.norm();
 		player.move();
 
-		
+		//Only update if the freezing powerup is not active
 		if (powerupActive == false) {
 			for(var i = theFlocks.length-1; i >=0 ; i--)
 			{
@@ -244,6 +250,11 @@ SETUP CONSTANTS
 			{
 			   theFlocks[i].update();
 			}
+			
+			//Randomly make the powerup appear if it is not visible
+			if (powerupDisplayed == false && Math.random() < (.001 * (score/35.0)) ) {
+				powerupDisplayed = true;
+			}
 		}
 		//Then we need to adjust the flock to the direction of the leader
 		//align(theBalls);
@@ -257,10 +268,11 @@ SETUP CONSTANTS
 					powerupActive = false;
 				}
 			} else {
-				powerupDisplayed = true;
 				checkPowerup();
 			}
 		}
+		
+		
 	}
 	function drawText()
 {
@@ -303,6 +315,7 @@ SETUP CONSTANTS
 			}
 			else if(gameState == "gameOver")
 			{
+				score = 0;
 				gameState = "intro";
 				funcArray.pop();
 				funcArray.push(drawText);
