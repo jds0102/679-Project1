@@ -13,7 +13,14 @@ SETUP CONSTANTS
 	var theCanvas = document.getElementById("mycanvas");
 	var theContext = theCanvas.getContext("2d");
 	
-	//var ballColors
+	var ballColors = new Array ( 	"#EE00EE" , "#BBFFFF" ,
+									"#E47833" , "#B22222" ,
+									"#D9D919" , "#912CEE" ,
+									"#C1FFC1" , "#FF0033" ,
+									"#BF3EFF" , "#C71585" ,
+									"#CECC15" , "#DD7500" ,
+									"#F3F638" , "#EE82EE" ,
+									"#FFCCFF" ,  "#FFFFFF"  );
 	
 	var userInput = new Array(false,false,false,false); 
 	// Order of storage is UP,DOWN,LEFT,RIGHT; Stored as booleans
@@ -30,7 +37,7 @@ SETUP CONSTANTS
 	var theFlocks =[]; //Seperate for faster alignment.
 
 	var player = new PlayerBall(450,220,8,8,5,"#00FF00");
-    var food = new Ball(10,10,0,0,8,"#D9D919");
+    var food = new Ball(10,10,0,0,8,"#ADFF2F");
     var powerup = new Powerup((Math.random() * 550) + 5,(Math.random() * 550) + 5, 10, "#2C75FF");
 	var minDistance = (player.radius+food.radius)*(player.radius+food.radius);
 	var minPowerupDistance = (player.radius+powerup.radius)*(player.radius+powerup.radius);
@@ -47,7 +54,8 @@ SETUP CONSTANTS
 	    b = new EnemyBall(50+Math.random()*500, 50+Math.random()*500,2,2,5, "#FFFFFF");
 	    if(currentFlock == 0 && flockCount == 0)
 		{
-			var firstFlock = new Flock('#'+Math.floor(Math.random()*16777215).toString(16));
+			//var firstFlock = new Flock('#'+Math.floor(Math.random()*16777215).toString(16));
+			var firstFlock = new Flock(ballColors[currentFlock]);
 			theFlocks.push(firstFlock);
 			theFlocks[currentFlock].addBall(b);
 			flockCount++;
@@ -64,7 +72,8 @@ SETUP CONSTANTS
 		}
 		else
 		{
-		   var tempFlock = new Flock('#'+Math.floor(Math.random()*16777215).toString(16));
+		   //var tempFlock = new Flock('#'+Math.floor(Math.random()*16777215).toString(16));
+		   var tempFlock = new Flock(ballColors[currentFlock+1]);
 		   tempFlock.addBall(b);
 		   theFlocks.push(tempFlock);
 		   flockCount = 1;
@@ -93,7 +102,7 @@ SETUP CONSTANTS
 	        theBalls.push(food);
 			theBalls.push(player);
 			theBalls.push(powerup);
-			for (i = 0; i < 25; i ++) {
+			for (i = 0; i < 1; i ++) {
 				generateBall();
 			}
 	   }
@@ -160,6 +169,7 @@ SETUP CONSTANTS
             food.x = 50+Math.random()*500;
 			food.y = 50+Math.random()*500;
 
+			generateBall();
 			generateBall();
         }
 	}
